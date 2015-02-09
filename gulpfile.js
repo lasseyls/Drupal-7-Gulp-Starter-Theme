@@ -26,19 +26,24 @@ gulp.task('scripts', function() {
             .pipe(gulp.dest('app/scripts'))
     );
 });
-
+// styles task, will run when any SCSS files change & BrowserSync
+// will auto-update browsers
 gulp.task('styles', function () {
-    return gulp.src('assets/scss/style.scss')
+    return gulp.src('assets/scss/**/*.scss')
+        .pipe($.sourcemaps.init())
         .pipe($.sass({
             outputStyle: 'nested', // libsass doesn't support expanded yet
             precision: 10,
             includePaths: ['.'],
-            onError: console.error.bind(console, 'Sass error:')
+            onError: function (err) { notify().write(err); console.error.bind(console, 'Sass error:'+err);}
         }))
         .pipe($.postcss([
             require('autoprefixer-core')({browsers: ['last 2 version']})
-        ]))
-        .pipe(gulp.dest('build/css'));
+         ]))
+        .pipe($.sourcemaps.write())
+        .pipe(gulp.dest('build/css'))
+        .pipe($.filter('scss**/*.css'))
+        .pipe(browserSync.reload({stream:true}));
 });
 
 gulp.task('jshint', function () {
@@ -69,7 +74,7 @@ gulp.task('images', function () {
             interlaced: true,
             svgoPlugins: [{removeViewBox: false}]
         })))
-        .pipe(gulp.dest('assets/images'));
+        .pipe(gulp.dest('build/images'));
 });
 
 gulp.task('fonts', function () {
@@ -92,23 +97,39 @@ gulp.task('extras', function () {
 
 gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
 
-gulp.task('serve',  ['styles'],function () {
-    browserSync({
-        notify: false,
-       // port: 9000,
-        proxy: "winterspringdesserts.kala"
+gulp.task('browser-sync', function(){
+    //watch files
+    var files = [
+        'build/css/style.css',
+        'assets/js/*js',
+        'assets/img/**/*',
+        'templates/*.tpl.php'
+    ];
+
+    return browserSync.init(files, {
+        proxy: "http://winterspringdesserts.kala",
+        open: false,
+        logLevel: 'debug',
+        injectChanges: true
     });
+});
+
+gulp.task('bs-reload', function (){
+    browserSync.reload();
+});
+
+gulp.task('watch',  ['styles', 'browser-sync'],function () {
 
     // watch for changes
-    gulp.watch([
-        'templates/*.tpl.php',
-        'style.css',
-        'assets/js/**/*.js',
-        'assets/images/**/*'
-    ]).on('change', reload);
+    //gulp.watch([
+    //    'templates/*.tpl.php',
+    //    'build/css/**/*.css',
+    //    'assets/js/**/*.js',
+    //    'assets/images/**/*'
+    //], ['bs-reload']);
 
-    gulp.watch('app/scripts/ts/**/*.ts', ['scripts']);
-    gulp.watch('assets/scss/**/*.scss', ['styles', reload]);
+  //  gulp.watch('app/scripts/ts/**/*.ts', ['scripts']);
+    gulp.watch('assets/scss/**/*.scss', ['styles']);
     //gulp.watch('bower.json', ['wiredep', 'fonts', reload]);
 });
 
@@ -120,7 +141,7 @@ gulp.task('wiredep', function () {
         .pipe(wiredep({
             ignorePath: /^(\.\.\/)+/
         }))
-        .pipe(gulp.dest('assets/css'));
+        .pipe(gulp.dest('build/css'));
 
 /*    gulp.src('app*//*.html')
         .pipe(wiredep({
