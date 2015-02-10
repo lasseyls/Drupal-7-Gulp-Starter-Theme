@@ -8,13 +8,11 @@ Lasse Moos ( [@supermoos](http://twitter.com/supermoos) / [yourlocalstudio.dk](h
 
 ## Summary
 
-Drupal 7 Starter Theme for use as a starting template for building custom themes. Uses SCSS/SASS (with libsass compiler), HTML5 Boilerplate 5 with Modernizr and Normalize.css, and Gulp for all tasks.
+Drupal 7 Gulp Starter Theme for use as a starting template for building custom themes. Uses SCSS/SASS (with libsass compiler), HTML5 Boilerplate 5 with Modernizr and Normalize.css, and Gulp for all tasks.
 
 ## Usage
 
 The theme is setup to use [Gulp](http://gulpjs.com/) to compile SCSS => CSS, [TypeScript](http://www.typescriptlang.org/) => JavaScript (both with source maps), optimize images, and live browser reload using [BrowserSync](http://www.browsersync.io/), with flexibility to add any additional tasks via the Gulp-file. Alternatively, you can use [CodeKit](http://incident57.com/codekit/) or whatever else you prefer to compile the SCSS and manage the JavaScript.
-
-Rename folder to your theme name, rename .info file to your theme name, change the `src/scss/style.scss` intro block to your theme information. Open the theme directory in terminal and run `npm install` to pull in all Gulp dependencies. Run `gulp watch` to execute tasks. Code as you will. To optimize images, run `gulp imagemin`. To build for production run `gulp build`
 
 ## What it does:
 
@@ -29,9 +27,11 @@ Rename folder to your theme name, rename .info file to your theme name, change t
 It does not aggregate, concat, minify or anything else fancy with the compiled CSS / JavaScript files because it is preferred to use the [Advanced CSS/JS Aggregation](https://www.drupal.org/project/advagg) module and [Magic](http://drupal.org/project/magic) for this.
 
 ## Configuration
+Rename folder to your theme name, rename .info file to your theme name, change the `src/scss/style.scss` intro block to your theme information. Open the theme directory in terminal and run `npm install` to pull in all Gulp dependencies. Run `gulp watch` to execute tasks. Code as you will. To optimize images, run `gulp imagemin`. To build for production run `gulp build`
+
 To use BrowserSync you will need to change which local development host you want to be proxied through BrowserSync.
 After running `gulp watch` your Terminal will output something like this:
-`
+'''
 [BS] Proxying: http://localhost:8888
 [BS] Access URLs:
  --------------------------------------
@@ -41,9 +41,10 @@ After running `gulp watch` your Terminal will output something like this:
           UI: http://localhost:3001
  UI External: http://172.22.33.125:3001
  --------------------------------------
-`
+[BS] Watching files...
+'''
 The default is not to open a browser window because you might find yourself having 10 `http://localhost:3000` tabs open after a while. Instead open one yourself or change the `browser-sync` task defaults in the gulpfile.js around:
-`
+'''
 gulp.task('browser-sync', function(){
     //watch files
     var files = [
@@ -59,7 +60,7 @@ gulp.task('browser-sync', function(){
         injectChanges: true
     });
 });
-`
+'''
 
 ### Deployment
 
