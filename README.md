@@ -16,7 +16,7 @@ The theme is setup to use [Gulp](http://gulpjs.com/) to compile SCSS => CSS, [Ty
 
 ## What it does:
 
-- Compile SCSS to CSS from `src/scss/style.scss` to `build/css/style.css`
+- Compile SCSS to CSS from `src/scss/style.scss` to `build/css/style.css` and use [Autoprefixer](https://github.com/postcss/autoprefixer) so frameworks like Compass and Bourbon can be mostly avoided.
 - Compile TypeScript to JavaScript from `src/scrips/ts/main.ts` to `build/scripts/main.js`
 - Minify images and move from `src/images/**/*` to `build/images/**/*`
 - Move fonts from `src/fonts/**/*` to `build/fonts/**/*`

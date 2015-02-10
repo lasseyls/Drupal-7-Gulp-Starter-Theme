@@ -3,22 +3,58 @@ description = Drupal 7 Gulp Starter Theme for use as a starting template for bui
 version = 1.0
 core = 7.x
 
-stylesheets[all][] = build/css/style.css
+; ========================================
+; Stylesheets
+; ========================================
 
-scripts[] = build/scripts/vendor/modernizr-2.8.3.min.js
+stylesheets[all][0] = build/css/style.css
 
-scripts[] = build/scripts/main.js
+; ========================================
+; Scripts
+; ========================================
 
+scripts[0] = build/scripts/vendor/modernizr-2.8.3.min.js
+scripts[1] = build/scripts/main.js
+
+; ========================================
+; Regions
+; ========================================
 
 regions[header] = Header
 regions[help] = Help
 regions[page_top] = Page top
 regions[page_bottom] = Page bottom
 regions[highlighted] = Highlighted
-
 regions[featured] = Featured
 regions[content] = Content
 regions[sidebar_first] = Sidebar first
 regions[sidebar_second] = Sidebar second
-
 regions[footer] = Footer
+
+; ========================================
+; Settings
+; ========================================
+
+settings[toggle_logo] = 1
+settings[toggle_name] = 1
+settings[toggle_slogan] = 1
+settings[toggle_node_user_picture] = 1
+settings[toggle_comment_user_picture] = 1
+settings[toggle_comment_user_verification] = 1
+settings[toggle_favicon] = 0
+settings[toggle_main_menu] = 1
+settings[toggle_secondary_menu] = 1
+settings[default_logo] = 1
+settings[logo_path] =
+settings[logo_upload] =
+settings[default_favicon] = 1
+settings[favicon_path] =
+settings[favicon_upload] =
+settings[magic_css_excludes] = :core
+settings[magic_footer_js] = 0
+settings[magic_library_head] = 0
+settings[magic_experimental_js] = 0
+settings[magic_js_excludes] =
+settings[magic_rebuild_registry] = 1
+settings[magic_viewport_indicator] = 0
+settings[magic_modernizr_debug] = 
