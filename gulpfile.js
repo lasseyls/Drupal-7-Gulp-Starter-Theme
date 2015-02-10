@@ -1,6 +1,5 @@
 /*global -$ */
 'use strict';
-// generated on 2015-01-19 using generator-gulp-webapp 0.2.0
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var browserSync = require('browser-sync');
@@ -8,28 +7,31 @@ var reload = browserSync.reload;
 var eventStream = require('event-stream');
 
 
-/*var tsProject = $.typescript.createProject({
+var tsProject = $.typescript.createProject({
     declarationFiles: false,
     noExternalResolve: true,
     sortOutput: true
-});*/
+});
 
 gulp.task('scripts', function() {
-    var tsResult = gulp.src('app/scripts/ts/**/*.ts')
+    var tsResult = gulp.src('src/scripts/ts/**/*.ts')
         .pipe($.sourcemaps.init()) // This means sourcemaps will be generated
         .pipe($.typescript(tsProject));
 
     return eventStream.merge( // Merge the two output streams, so this task is finished when the IO of both operations are done.
-        tsResult.dts.pipe(gulp.dest('app/scripts/ts/definitions')),
-        tsResult.js.pipe($.concat('main.js')) // You can use other plugins that also support gulp-sourcemaps
+        tsResult.dts.pipe(gulp.dest('src/scripts/ts/definitions')),
+        tsResult.js.pipe(
+            $.concat('main.js')) // You can use other plugins that also support gulp-sourcemaps
             .pipe($.sourcemaps.write()) // Now the sourcemaps are added to the .js file
-            .pipe(gulp.dest('app/scripts'))
+            .pipe(gulp.dest('build/scripts')
+        )
     );
 });
+
 // styles task, will run when any SCSS files change & BrowserSync
 // will auto-update browsers
 gulp.task('styles', function () {
-    return gulp.src('assets/scss/**/*.scss')
+    return gulp.src('src/scss/**/*.scss')
         .pipe($.sourcemaps.init())
         .pipe($.sass({
             outputStyle: 'nested', // libsass doesn't support expanded yet
@@ -47,28 +49,17 @@ gulp.task('styles', function () {
 });
 
 gulp.task('jshint', function () {
-    return gulp.src('app/scripts/**/*.js')
+    return gulp.src('build/scripts/**/*.js')
         .pipe(reload({stream: true, once: true}))
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish'))
         .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
 });
 
-gulp.task('html', ['styles', 'scripts'], function () {
-    var assets = $.useref.assets({searchPath: ['.tmp', 'app', '.']});
-
-    return gulp.src('app/*.html')
-        .pipe(assets)
-        .pipe($.if('*.js', $.uglify()))
-        .pipe($.if('*.css', $.csso()))
-        .pipe(assets.restore())
-        .pipe($.useref())
-        //.pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true, empty: true, spare: true, cdata: true, comments: true})))
-        .pipe(gulp.dest('dist'));
-});
 
 gulp.task('images', function () {
-    return gulp.src('assets/images/*')
+    return gulp.src('src/images/**/*')
+        .pipe($.newer('build/'))
         .pipe($.cache($.imagemin({
             progressive: true,
             interlaced: true,
@@ -78,82 +69,68 @@ gulp.task('images', function () {
 });
 
 gulp.task('fonts', function () {
-    return gulp.src(require('main-bower-files')().concat('app/fonts/**/*'))
+    return gulp.src('src/fonts/**/*')
         .pipe($.filter('**/*.{eot,svg,ttf,woff}'))
-        .pipe($.flatten())
-        .pipe(gulp.dest('.tmp/fonts'))
-        .pipe(gulp.dest('dist/fonts'));
+        .pipe(gulp.dest('build/fonts'));
 });
 
 gulp.task('extras', function () {
     return gulp.src([
-        'app/*.*',
-        '!app/*.html',
-        'node_modules/apache-server-configs/dist/.htaccess'
+        'src/*.*',
+        'src/scripts/vendor/**/*'
     ], {
+        base: 'src/',
         dot: true
-    }).pipe(gulp.dest('dist'));
-});
-
-gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
-
-gulp.task('browser-sync', function(){
-    //watch files
-    var files = [
-        'build/css/style.css',
-        'assets/js/*js',
-        'assets/img/**/*',
-        'templates/*.tpl.php'
-    ];
-
-    return browserSync.init(files, {
-        proxy: "http://winterspringdesserts.kala",
-        open: false,
-        logLevel: 'debug',
-        injectChanges: true
-    });
+    }).pipe(gulp.dest('build'));
 });
 
 gulp.task('bs-reload', function (){
     browserSync.reload();
 });
 
-gulp.task('watch',  ['styles', 'browser-sync'],function () {
+gulp.task('browser-sync', function(){
+    //watch files
+    var files = [
+        'build/css/**/*.css',
+        'build/scripts/**/*js',
+        'build/images/**/*',
+        'templates/*.tpl.php'
+    ];
 
-    // watch for changes
-    //gulp.watch([
-    //    'templates/*.tpl.php',
-    //    'build/css/**/*.css',
-    //    'assets/js/**/*.js',
-    //    'assets/images/**/*'
-    //], ['bs-reload']);
+    return browserSync.init(files, {
+        proxy: "http://localhost:8888", //change this to whatever your local development URL is.
+        open: false,
+        injectChanges: true
+    });
+});
 
-  //  gulp.watch('app/scripts/ts/**/*.ts', ['scripts']);
-    gulp.watch('assets/scss/**/*.scss', ['styles']);
+gulp.task('drush', $.shell.task([
+    "cd ~/.kalabox/kalastack/ && vagrant ssh -c 'cd /var/www/winterspringdesserts; drush status; exit;'"
+]));
+
+gulp.task('watch',  ['images', 'fonts', 'styles', 'scripts', 'extras', 'browser-sync'],function () {
+
+    gulp.watch('src/scripts/ts/**/*.ts', ['scripts']);
+    gulp.watch('src/scss/**/*.scss', ['styles']);
+    gulp.watch('images/**/*', ['images']);
+    gulp.watch('src/scripts/vendor/**/*', ['extras']);
+    gulp.watch('src/fonts/*', ['fonts']);
     //gulp.watch('bower.json', ['wiredep', 'fonts', reload]);
 });
 
-// inject bower components
-gulp.task('wiredep', function () {
-    var wiredep = require('wiredep').stream;
-
-    gulp.src('assets/scss/*.scss')
-        .pipe(wiredep({
-            ignorePath: /^(\.\.\/)+/
-        }))
-        .pipe(gulp.dest('build/css'));
-
-/*    gulp.src('app*//*.html')
-        .pipe(wiredep({
-            ignorePath: /^(\.\.\/)*\.\./
-        }))
-        .pipe(gulp.dest('app'));*/
+gulp.task('clear', function (done) {
+    return $.cache.clearAll(done);
 });
 
-gulp.task('build', ['html', 'images', 'fonts', 'extras'], function () {
-    return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
+gulp.task('cleanFonts', require('del').bind(null, ['build/fonts']));
+
+
+gulp.task('clean', require('del').bind(null, ['.tmp', 'build']));
+
+gulp.task('build', ['images', 'fonts', 'styles', 'scripts', 'extras'], function () {
+    return gulp.src('build/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
-gulp.task('default', ['clean'], function () {
+gulp.task('default', ['clear', 'clean'], function () {
     gulp.start('build');
 });

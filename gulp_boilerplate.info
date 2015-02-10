@@ -1,11 +1,13 @@
 name = gulp_boilerplate
-description = Drupal 7 Starter Theme for use as a starting template for building custom themes. Uses HTML5 Boilerplate with Modernizr and Normalize.css.
-version = 2.0
+description = Drupal 7 Gulp Starter Theme for use as a starting template for building custom themes. Uses HTML5 Boilerplate with Modernizr and Normalize.css.
+version = 1.0
 core = 7.x
 
 stylesheets[all][] = build/css/style.css
 
-scripts[] = assets/js/vendor/modernizr-2.6.2.min.js
+scripts[] = build/scripts/vendor/modernizr-2.8.3.min.js
+
+scripts[] = build/scripts/main.js
 
 
 regions[header] = Header
