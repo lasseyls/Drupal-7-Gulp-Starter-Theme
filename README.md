@@ -31,7 +31,7 @@ Rename folder to your theme name, rename .info file to your theme name, change t
 
 To use BrowserSync you will need to change which local development host you want to be proxied through BrowserSync.
 After running `gulp watch` your Terminal will output something like this:
-'''
+```
 [BS] Proxying: http://localhost:8888
 [BS] Access URLs:
  --------------------------------------
@@ -42,9 +42,9 @@ After running `gulp watch` your Terminal will output something like this:
  UI External: http://172.22.33.125:3001
  --------------------------------------
 [BS] Watching files...
-'''
+```
 The default is not to open a browser window because you might find yourself having 10 `http://localhost:3000` tabs open after a while. Instead open one yourself or change the `browser-sync` task defaults in the gulpfile.js around:
-'''
+```
 gulp.task('browser-sync', function(){
     //watch files
     var files = [
@@ -60,7 +60,7 @@ gulp.task('browser-sync', function(){
         injectChanges: true
     });
 });
-'''
+```
 
 ### Deployment
 
